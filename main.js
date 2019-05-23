@@ -1,9 +1,8 @@
-(async() => {
-    
+let server = async() => {
 	try{
 		// config.js
 		const DB_URL = "mongodb://localhost:27017/pufulete-poc"
-		const PORT = 1337
+		const PORT = require.main === module ? 1337 : 7331 // If testing, change the port!
 
 
 		const mongoose = require('mongoose');
@@ -18,6 +17,7 @@
 		
 		const Comment = mongoose.model('Comment', { 
 			userid: {type: String, required: true},
+            userid_creator: {type: String, required: true},
 			text: {type: String, required: true},
 			created_at: {type: Date, default: new Date()}
 		});
@@ -27,6 +27,10 @@
 			value: {type: String, required: true},
 			created_at: {type: Date, default: new Date()}
 		});
+
+        // await User.deleteMany({})
+        // await Comment.deleteMany({})
+        // await Session.deleteMany({})
 
 		// utils.js
 		let generateSession = () => require("crypto").randomBytes(16).toString("hex")
@@ -71,7 +75,7 @@
 			let {ssid} = req.params
 			if(!await validateAuth(ssid)) return res.status(401).end()
 
-			let users = await User.find({}, "_id username created_at")
+			let users = await User.find({}, "_id username")
 
 			res.json(users)
 		})
@@ -108,4 +112,9 @@
 
 		console.log("Running")
 	}catch(e){console.log(e)}
-})()
+}
+
+if(require.main === module)
+    server()
+else
+    module.exports = server

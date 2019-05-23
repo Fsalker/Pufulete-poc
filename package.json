@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test.js --exit --timeout 5000"
   },
   "repository": {
     "type": "git",
@@ -14,9 +14,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "chai": "^4.2.0",
     "express": "^4.17.0",
     "express-async-errors": "^3.1.1",
-    "jest": "^24.8.0",
-    "mongoose": "^5.5.10"
+    "mocha": "^6.1.4",
+    "mongoose": "^5.5.10",
+    "node-fetch": "^2.6.0",
+    "request-promise-native": "^1.0.7"
   }
 }
