@@ -1,12 +1,12 @@
 let server = async() => {
 	try{
 		// config.js
-		const DB_URL = "mongodb://localhost:27017/pufulete-poc"
+		const DB_URL = `mongodb://${process.env.DOCKER ? "mongo" : "localhost"}:27017/pufulete-poc`
 		const PORT = require.main === module ? 1337 : 7331 // If testing, change the port!
 
 
 		const mongoose = require('mongoose');
-		mongoose.connect(DB_URL, {useNewUrlParser: true});
+		await mongoose.connect(DB_URL, {useNewUrlParser: true});
 
 		// models.js
 		const User = mongoose.model('User', { 
