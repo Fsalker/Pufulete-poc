@@ -1,6 +1,16 @@
 version: "3"
 services:
+  elastic:
+    environment:
+      node.name: es01
+      cluster.initial_master_nodes: es01
+    image: elasticsearch:7.1.0
+    volumes:
+      - ./es_data
+    ports:
+      - "9206:9200"
   backend:
+    restart: always
     env_file:
       - env.env
     build: ./back-end
@@ -8,6 +18,7 @@ services:
       - "2000:1337"
     links: 
       - mongo
+      - elastic
   quote-of-the-day:
     env_file:
       - env.env
