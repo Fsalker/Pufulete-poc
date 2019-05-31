@@ -3,6 +3,8 @@ let request = require("request-promise-native")
 require("chai").should()
 
 describe("Should execute all the features an user can do", async() => {
+    const API_PORT = 1337
+
     const USERNAME_1 = "gigelovich"+Math.random()
     const USERNAME_2 = "bibelovich"+Math.random()
     const PASSWORD_1 = "secretovich"
@@ -15,15 +17,15 @@ describe("Should execute all the features an user can do", async() => {
     let USERID_1
     let USERID_2
 
-    const HOST = `http://localhost:7331`
+    const HOST = `http://localhost:${API_PORT}`
     const REGISTER_ROUTE = "/register"
     const LOGIN_ROUTE = "/login"
     const USERS_ROUTE = "/users"
     const COMMENTS_ROUTE = "/comments"
 
-    before(async() => {
-        await server()
-    })
+    // before(async() => {
+    //     await server()
+    // })
 
     // describe("Should delete accounts", () => {
     //     it("Should delete account (1)", async() => {

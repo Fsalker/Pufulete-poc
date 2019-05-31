@@ -4,9 +4,14 @@ let server = async() => {
 		const DB_URL = `mongodb://${process.env.DOCKER ? "mongo" : "localhost"}:27017/pufulete-poc`
 		const PORT = require.main === module ? 1337 : 7331 // If testing, change the port!
 
-
+		// Initialise
 		const mongoose = require('mongoose');
-		await mongoose.connect(DB_URL, {useNewUrlParser: true});
+		await mongoose.connect(DB_URL, {useNewUrlParser: true, useCreateIndex: true});
+
+		const { Client } = require('@elastic/elasticsearch')
+		let elastic_node = `http://${process.env.DOCKER ? "elastic" : "localhost"}:9200`
+		const elasticClient = await new Client({ node: elastic_node })
+		await elasticClient.ping() // Assert that the elastic client has connected succesfully
 
 		// models.js
 		const User = mongoose.model('User', { 
@@ -46,6 +51,28 @@ let server = async() => {
 		let app = express()
 		require('express-async-errors'); // this is magic, but I have no idea how it works! D:
 		app.use(express.json())
+		
+		// logger.js
+		let fs = require("fs")
+		let logStream = fs.createWriteStream("./log.txt", {flags: "a"})
+		app.use((req, res, next) => {
+			let d = new Date()
+    		let date_now = "[" + d.getFullYear() + "/" + ("0" + d.getMonth()).slice(-2) + "/" +  ("0" + d.getDate()).slice(-2) + " - "+("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2) + ":" + ("0" + d.getSeconds()).slice(-2) + "] "
+    		let client_IP = req.connection.remoteAddress
+
+    		let msg = `${date_now} Client ${client_IP} has accessed ${req.originalUrl}\n`
+    		console.log(msg.slice(0, -1))
+    		logStream.write(msg)
+    		elasticClient.create({
+				id: Math.random(),
+				index: "logs-hooray",
+				body: {
+					log: msg
+				}
+			})
+
+    		next()
+		})
 
 		// routes.js
 		app.post("/register", async(req, res) => {
@@ -81,15 +108,28 @@ let server = async() => {
 		})
 
 		app.post("/comments", async(req, res) => {
+			console.log("inside comments")
 			let {ssid, userid, text} = req.body
 			let userid_creator = await validateAuth(ssid)
 			if(!userid_creator) res.status(401).end()
 
+			console.log("1")
 			await Comment.create({
 				userid,
 				userid_creator,
 				text
 			})
+
+			console.log("1")
+			await elasticClient.create({
+				id: Math.random(),
+				index: "comments-hooray",
+				body: {
+					text
+				}
+			})
+
+			console.log("1")
 
 			res.end()
 		})
@@ -110,8 +150,11 @@ let server = async() => {
 		// server.js
 		app.listen(PORT)
 
-		console.log("Running")
-	}catch(e){console.log(e)}
+		console.log(`API Back end is running...`)
+	}catch(e){
+		console.log(e)
+		process.exit()
+	}
 }
 
 if(require.main === module)
