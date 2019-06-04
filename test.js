@@ -3,13 +3,13 @@ let request = require("request-promise-native")
 require("chai").should()
 
 describe("Should execute all the features an user can do", async() => {
-    const API_PORT = 1337
+    const API_PORT = 2000
 
     const USERNAME_1 = "gigelovich"+Math.random()
     const USERNAME_2 = "bibelovich"+Math.random()
     const PASSWORD_1 = "secretovich"
     const PASSWORD_2 = "sekretovich"
-    const COMMENT_1 = "you rock!!1"
+    const COMMENT_1 = "you rock!!123"
 
     const ERR_SHOULD_HAVE_BEEN_THROWN = new Error("An error should have been thrown here, but there's no error!")
     let SESSION_1
@@ -77,22 +77,18 @@ describe("Should execute all the features an user can do", async() => {
             r.should.be.a("array")
             r.length.should.be.at.least(2)
             r[0].should.have.all.keys("_id", "username")
-            USERID_1 = r.find(user => user.username === USERNAME_1)
-            USERID_2 = r.find(user => user.username === USERNAME_2)
+            USERID_1 = r.find(user => user.username === USERNAME_1)._id
+            USERID_2 = r.find(user => user.username === USERNAME_2)._id
         })
 
         it("Should not get users", async() => {
-            try{
+            try{ 
                 let method = "GET"
-                let uri = `${HOST}${USERS_ROUTE}/${SESSION_1}`
+                let uri = `${HOST}${USERS_ROUTE}/${SESSION_1+"1"}`
                 let r = await request({uri, method})
-                r = JSON.parse(r)
-                r.should.be.a("array")
-                r.length.should.be.at.least(2)
-                r[0].should.have.all.keys("_id", "username")
-                USERID_1 = r.find(user => user.username === USERNAME_1)
-                USERID_2 = r.find(user => user.username === USERNAME_2)
+                throw ERR_SHOULD_HAVE_BEEN_THROWN
             }catch(e){
+                if(e.statusCode != 401) console.log("good!")
                 if(e === ERR_SHOULD_HAVE_BEEN_THROWN) throw e
             }
         })
@@ -100,7 +96,7 @@ describe("Should execute all the features an user can do", async() => {
 
     describe("Comments", () => {
         it("Should write comment (user 2 to user 1)", async() => {
-            let data = {ssid: SESSION_2, userid: USERID_2, text: COMMENT_1}
+            let data = {ssid: SESSION_2, userid: USERID_1, text: COMMENT_1}
             let method = "POST"
             let r = await request({uri: `${HOST}${COMMENTS_ROUTE}`, method, json: data})
         })
@@ -114,6 +110,11 @@ describe("Should execute all the features an user can do", async() => {
             r.length.should.be.at.least(1)
             r[0].should.have.all.keys("_id", "text", "userid", "userid_creator", "created_at")
             let comment = r.find(comment => comment.userid === USERID_1 && comment.userid_creator === USERID_2)
+            comment.should.be.ok
+            // console.log(USERID_1+" "+USERID_2)
+        })
+    })
+})comment = r.find(comment => comment.userid === USERID_1 && comment.userid_creator === USERID_2)
         })
     })
 })
