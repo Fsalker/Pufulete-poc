@@ -114,7 +114,4 @@ describe("Should execute all the features an user can do", async() => {
             // console.log(USERID_1+" "+USERID_2)
         })
     })
-})comment = r.find(comment => comment.userid === USERID_1 && comment.userid_creator === USERID_2)
-        })
-    })
 })
