@@ -29,11 +29,12 @@ let server = async() => {
 		// routes.js
 		app.use(require("./routes"))
 
+		// Swagger route
+		app.use(require("./swagger/swaggerServer.js"))
+
 		// Run da m4d4f4k1n server, N!
 		app.listen(PORT)
-
 		console.log(`API Back end is running on PORT ${PORT}`)
-		return "good"
 	}catch(e){
 		console.log(e)
 		process.exit()

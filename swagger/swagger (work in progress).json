@@ -1,0 +1,94 @@
+swagger: "2.0"
+info:
+  description: "This is our awesome poculeț!"
+  version: "1.69"
+  title: "Poculeț șmecher"
+  # contact:
+  #   email: "apiteam@swagger.io"
+  # license:
+  #   name: "Apache 2.0"
+  #   url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:1337"
+# basePath: "/v2"
+tags:
+- name: "Authentification"
+  description: "Use these APIs in order to receive a Session"
+- name: Users
+  description: "APIs related to the user (CRUD)"
+- name: Comments
+  description: "APIs related to the comments (CRUD)"
+  # externalDocs:
+  #   description: "Find out more"
+  #   url: "http://swagger.io"
+schemes:
+- "http"
+paths:
+  /register:
+    post:
+      tags:
+      - "Authentification"
+      summary: "Register a new account"
+      # description: ""
+      operationId: "register"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: body
+          name: "username"
+          description: "The desired username"
+          type: string
+        - in: body
+          name: "password"
+          description: "The account's password"
+          # required: true
+          type: string
+      responses:
+        409:
+          description: "Username is already taken"
+  /login:
+    post:
+      tags:
+      - "Authentification"
+      summary: "Logs into an existing account"
+      # description: ""
+      operationId: "login"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: query
+          name: "username"
+          description: "The desired username"
+          type: string
+        - in: query
+          name: "password"
+          description: "The account's password"
+          # required: true
+          type: string
+      responses:
+        404:
+          description: "Authentification has failed as the provided username & password combination did not provide any results."
+  /users/{ssid}:
+    get:
+      tags:
+      - "Users"
+      summary: "Register a new account"
+      # description: ""
+      operationId: "usersGet"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+        - in: path
+          name: ssid
+          type: string
+          description: "A valid session to access the APIs with"
+          required: true
+        
+      responses:
+        401:
+          description: "Session is invalid"
