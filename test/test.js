@@ -1,9 +1,9 @@
-let server = require("./main.js")
+let server = require("../main.js")
 let request = require("request-promise-native")
 require("chai").should()
 
 describe("Should execute all the features an user can do", async() => {
-    const API_PORT = 2000
+    const API_PORT = process.env.DOCKER ? 2000 : 7331
 
     const USERNAME_1 = "gigelovich"+Math.random()
     const USERNAME_2 = "bibelovich"+Math.random()
@@ -23,15 +23,10 @@ describe("Should execute all the features an user can do", async() => {
     const USERS_ROUTE = "/users"
     const COMMENTS_ROUTE = "/comments"
 
-    // before(async() => {
-    //     await server()
-    // })
-
-    // describe("Should delete accounts", () => {
-    //     it("Should delete account (1)", async() => {
-
-    //     })
-    // })
+    before(async() => {
+        if(!process.env.DOCKER)
+            await server()
+    })
 
     describe("Users", () => {
         it("Should register an account (1)", async() => {
@@ -88,7 +83,6 @@ describe("Should execute all the features an user can do", async() => {
                 let r = await request({uri, method})
                 throw ERR_SHOULD_HAVE_BEEN_THROWN
             }catch(e){
-                if(e.statusCode != 401) console.log("good!")
                 if(e === ERR_SHOULD_HAVE_BEEN_THROWN) throw e
             }
         })
@@ -111,7 +105,6 @@ describe("Should execute all the features an user can do", async() => {
             r[0].should.have.all.keys("_id", "text", "userid", "userid_creator", "created_at")
             let comment = r.find(comment => comment.userid === USERID_1 && comment.userid_creator === USERID_2)
             comment.should.be.ok
-            // console.log(USERID_1+" "+USERID_2)
         })
     })
 })
